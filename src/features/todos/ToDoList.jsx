@@ -1,51 +1,69 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { BallTriangle } from 'react-loader-spinner';
 import { useState } from "react";
-import { useGetToDosQuery } from "../api/apiSlice";
+import { useGetToDosQuery } from '../api/apiSlice';
 
-const TodoList = () => {
-  const [newTodo, setNewTodo] = useState("");
+const ToDoList = () => {
+  const [newToDo, setNewToDo] = useState('');
 
-  // renamed data with 'toDos' alias, destructured props from custom query hook
+  // Destructure query responses with custom query hook
   const {
     data: toDos,
     isLoading,
     isSuccess,
     isError,
-    error,
+    error
   } = useGetToDosQuery();
 
+  // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    setNewTodo("");
-  };
+    setNewToDo('');
+  }
 
-  const newItemSection = (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="new-todo">Enter a new todo item</label>
+  // Add ToDo form
+  const newItemSection =
+    <form onSubmit={() => handleSubmit}>
+      <label htmlFor="new-todo">Enter a new ToDo item:</label>
       <div className="new-todo">
         <input
-          type="text"
-          id="new-todo"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="Enter new todo"
-        />
+        type="text"
+        id="new-todo"
+        value={newToDo}
+        onChange={() => setNewToDo(e.target.value)}
+        placeholder = "Enter a new ToDo" />
       </div>
       <button className="submit">
         <FontAwesomeIcon icon={faUpload} />
       </button>
     </form>
-  );
 
+  // Conditional content rendering based on response from useGetToDosQuery()
   let content;
+  
+  if (isLoading) {
+    content = 
+    <>
+      <p className="loader">Loading...</p>
+      <div className="loader">
+        <BallTriangle
+        height={100}
+        color = "#61dbfb" />
+      </div>
+    </>
+  } else if (isSuccess) {
+    content = JSON.stringify(toDos);
+  } else if (isError) {
+    content = <p>{error}</p>
+  }
 
   return (
     <main>
-      <h1>Todo List</h1>
+      <h1>ToDo List</h1>
       {newItemSection}
       {content}
     </main>
-  );
-};
-export default TodoList;
+  )
+}
+export default ToDoList;
