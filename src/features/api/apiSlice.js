@@ -20,8 +20,20 @@ export const apiSlice = createApi({
         method: 'PATCH',
         body: toDo
       })
+    }),
+    deleteToDo: builder.mutation({
+      query: ({ id }) => ({
+        url: `/todos/${id}`,
+        method: 'DELETE',
+        body: id
+      })
     })
   })
 });
 
-export const { useGetToDosQuery } = apiSlice;
+export const {
+  useGetToDosQuery,
+  useAddToDoMutation,
+  useUpdateToDoMutation,
+  useDeleteToDoMutation
+} = apiSlice;
