@@ -9,3 +9,5 @@ export const apiSlice = createApi({
     });
   }
 });
+
+export const { useGetToDosQuery } = apiSlice;
