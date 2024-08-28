@@ -1,4 +1,4 @@
-import ToDoList from '../features/todos/ToDoList';
+import ToDoList from './features/todos/ToDoList';
 
 const App = () => {
   return (
