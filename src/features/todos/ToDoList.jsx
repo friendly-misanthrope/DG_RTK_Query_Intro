@@ -2,12 +2,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { BallTriangle } from 'react-loader-spinner';
 import { useState } from "react";
-import { useGetToDosQuery } from '../api/apiSlice';
+import { 
+  useGetToDosQuery,
+  useAddToDoMutation,
+  useUpdateToDoMutation,
+  useDeleteToDoMutation
+} from '../api/apiSlice';
 
 const ToDoList = () => {
   const [newToDo, setNewToDo] = useState('');
 
-  // Destructure query responses with custom query hook
+  // Destructure props from query response
   const {
     data: toDos,
     isLoading,
@@ -16,22 +21,28 @@ const ToDoList = () => {
     error
   } = useGetToDosQuery();
 
+  // RTK Query C/U/D Fns
+  const [addToDo] = useAddToDoMutation();
+  const [updateToDo] = useUpdateToDoMutation();
+  const [deleteToDo] = useDeleteToDoMutation();
+
   // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
+    addToDo({ userId: 1, title: newToDo, isComplete: false });
     setNewToDo('');
   }
 
   // Add ToDo form
   const newItemSection =
-    <form onSubmit={() => handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <label htmlFor="new-todo">Enter a new ToDo item:</label>
       <div className="new-todo">
         <input
         type="text"
         id="new-todo"
         value={newToDo}
-        onChange={() => setNewToDo(e.target.value)}
+        onChange={(e) => setNewToDo(e.target.value)}
         placeholder = "Enter a new ToDo" />
       </div>
       <button className="submit">
@@ -53,7 +64,26 @@ const ToDoList = () => {
       </div>
     </>
   } else if (isSuccess) {
-    content = JSON.stringify(toDos);
+    content = toDos.map((toDo) => {
+      return (
+        <article key={toDo.id}>
+          <div className="todo">
+            <input
+              type="checkbox"
+              checked={toDo.isComplete}
+              id={toDo.id}
+              onChange={() => updateToDo({ ...toDo, isComplete: !toDo.isComplete })}
+            />
+            <label htmlFor={toDo.id}>{toDo.title}</label>
+          </div>
+        <button
+        className="trash"
+        onClick={() => deleteToDo({ id: toDo.id })}>
+          <FontAwesomeIcon icon={faTrash} />
+        </button>
+        </article>
+      )
+    })
   } else if (isError) {
     content = <p>{error}</p>
   }
